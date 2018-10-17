@@ -1,5 +1,5 @@
 {
-  "name": "korauter",
+  "name": "@rezeus/korauter",
   "version": "1.0.0-beta",
   "description": "Yet another Koa router, inspired by Vue Router.",
   "main": "lib/Router.js",
