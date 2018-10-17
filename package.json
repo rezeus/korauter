@@ -1,0 +1,52 @@
+{
+  "name": "korauter",
+  "version": "1.0.0-beta",
+  "description": "Yet another Koa router, inspired by Vue Router.",
+  "main": "lib/Router.js",
+  "files": [
+    "lib",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha"
+  },
+  "keywords": [
+    "koa",
+    "router",
+    "meta",
+    "vue-router"
+  ],
+  "author": "Ozan Müyesseroğlu <ozanmuyes@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rezeus/korauter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rezeus/korauter/issues"
+  },
+  "homepage": "https://github.com/rezeus/korauter#readme",
+  "dependencies": {
+    "path-to-regexp": "^2.4.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.0",
+    "eslint": "^5.6.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-chai-friendly": "^0.4.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-mocha": "^5.2.0",
+    "expect.js": "^0.3.1",
+    "koa": "^2.5.3",
+    "methods": "^1.1.2",
+    "mocha": "^5.2.0",
+    "should": "^13.2.3",
+    "supertest": "^3.3.0"
+  },
+  "engines": {
+    "node": "^7.6.0"
+  }
+}

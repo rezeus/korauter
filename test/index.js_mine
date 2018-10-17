@@ -1,0 +1,59 @@
+'use strict';
+
+// FIXME If original tests are passing then switch to 'chai' completely (i.e. expect, request)
+
+const http = require('http');
+
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const expect = require('expect.js');
+const Koa = require('koa');
+const should = require('should'); // eslint-disable-line no-unused-vars
+
+const Router = require('../lib/Router');
+const Layer = require('../lib/Layer');
+
+chai.use(chaiHttp);
+
+// const expect = chai.expect;
+
+describe('Router', function() {
+  it('creates new router instance', function() {
+    const router = new Router();
+    router.should.be.instanceOf(Router);
+    // expect(router).instanceOf(Router);
+  });
+
+  it('shares context between routers (gh-205)', function (done) {
+    const app = new Koa();
+    const router1 = new Router();
+    const router2 = new Router();
+
+    router1.get('/', function (ctx, next) {
+      ctx.foo = 'bar';
+      return next();
+    });
+    router2.get('/', function (ctx, next) {
+      ctx.baz = 'qux';
+      ctx.body = { foo: ctx.foo };
+      return next();
+    });
+
+    app
+      .use(router1.routes())
+      .use(router2.routes());
+    chai.request(http.createServer(app.callback()))
+      .get('/')
+      .expect(200)
+      .end(function (err, res) {
+        // if (err) return done(err);
+        expect(err).to.be(null);
+
+        expect(res.body).to.have.property('foo', 'bar');
+
+        done();
+      });
+  });
+
+  // TODO https://github.com/alexmingoia/koa-router/blob/master/test/lib/router.js#L48
+});
