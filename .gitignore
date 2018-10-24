@@ -1,2 +1,5 @@
 node_modules/
 .vscode/
+
+example.js
+test/koa-router_lib_router.js_others
