@@ -2,6 +2,29 @@
 
 Yet another Koa router, inspired by Vue Router.
 
+## Table of Contents
+
+* [Features](#features)
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Classic Style](#classic-style)
+  * [Vue Router Style](#vue-router-style)
+* [API](#api)
+  * [Router.url(path, params[, opts])](#routerurlpath-params-opts)
+  * [Router([options])](#routeroptions)
+  * [router\[get|post|put|del|patch\]\(args)](#routergetpostputdelpatchargs)
+  * [router.scope(args)](#routerscopeargs)
+  * [router.register(routes)](#routerregisterroutes)
+  * [router.url\(name, params\[, opts\]\)](#routerurlname-params-opts)
+  * [router.resolve()](#routerresolve)
+  * [router.handle()](#routerhandle)
+  * [router.routes()](#routerroutes)
+* [Roadmap](#roadmap)
+* [Acknowledgements](#acknowledgements)
+* [Comparison with Other Packages](#comparison-with-other-packages)
+  * [koa-router](#koa-router)
+* [License](#license)
+
 ## Features
 
 * Express-style routing; e.g. `router.get`, `router.post`
@@ -209,8 +232,8 @@ Other than this key substitution there is one key, named as `method`, has been a
 const routes = [
   {
     method: 'get',
-    path: '/',
     // Rest is same
+    path: '/',
     handler: (ctx) => {
       ctx.body = 'Hello World!';
     },
@@ -422,6 +445,47 @@ app.listen(8080);
 
 ## API
 
+### Router.url(path, params[, opts])
+
+A static method to create URL with path and (optionally) query parameters. `path` is the string representation of the URL pattern, `params` and `opts` are object. `opts.query` is the query parameters key-value object. Other keys for the `opts` object is going to be handed to  `ljharb/qs` package **after** merging with defaults. Please see available options at [qs documentation](https://github.com/ljharb/qs#stringifying). Only defaulted value is `arrayFormat: 'brackets'`, so if you pass this object as `opts` to the method;
+
+```javascript
+const opts = {
+  query: { /* ... */},
+};
+```
+
+it is going to be like this;
+
+```javascript
+const opts = {
+  query: { /* ... */},
+  arrayFormat: 'brackets',
+};
+```
+
+> Please note that the `path` is the path component of a URL described in [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3).
+
+Examples;
+
+```javascript
+Router.url('/users'); // '/users'
+Router.url('/products/by/acme'); // '/products/by/acme'
+
+Router.url('/users/:userId', { userId: 42 }); // '/users/42'
+Router.url('/users/:userId/posts/:postId', { userId: 42, postId: 13 }); // '/users/42/posts/13'
+
+Router.url('/users/:userId/posts', { userId: 42 }, { query: { sort: ['-date', 'title'] }, encode: false });
+// '/users/42/posts?sort[]=-date&sort[]=title'
+
+Router.url('/users', {}, { query: { sort: ['-date', 'title'], foo: { bar: 1, baz: false } }, encode: false });
+// '/users?sort[]=-date&sort[]=title&foo[bar]=1&foo[baz]=false'
+Router.url('/users', {}, { query: { sort: ['-date', 'title'], foo: { bar: 1, baz: false } }, allowDots: true, encode: false });
+// '/users?sort[]=-date&sort[]=title&foo.bar=1&foo.baz=false'
+
+// NOTE `encode: false` is for demonstration purposes only
+```
+
 ### Router([options])
 
 Create a new router instance.
@@ -480,13 +544,129 @@ router.scope('Users', '/users', (users) => {
 router.url('ProfileOneUsers', { username: 'john-doe' }); // '/users/john-doe/profile'
 ```
 
+### router[get|post|put|del|patch]\(args)
+
+Arguments list may be one of;
+
+1. path, handler
+1. name, path, handler
+1. path, handler, meta
+1. name, path, handler, meta
+
+where;
+
+* 'path' is a `string` starting with /,
+* 'handler' is a `function`,
+* 'name' is a `string`,
+* 'meta' is an `object`.
+
+Here are quick tips to remember the method signature;
+
+* 'path' always followed by 'handler',
+* 'name' is the 1st parameter if defined,
+* 'meta' is the last parameter if defined.
+
+Those methods (i.e. `router.get()`, `router.post()`) provided by the default layer. Layer is merely a class to ease scoping by proxying the registration of the routes to the router. It's an interesting concept, and we encourage you to take a peek at the source code to better understand it.
+
+### router.scope(args)
+
+Arguments list may be one of;
+
+1. path, scopeFn
+1. name, path, scopeFn
+1. path, scopeFn, meta
+1. name, path, scopeFn, meta
+
+where;
+
+* 'path' is a `string` starting with /,
+* 'scopeFn' is a `function`,
+* 'name' is a `string`,
+* 'meta' is an `object`.
+
+Here are quick tips to remember the method signature;
+
+* 'path' always followed by 'scopeFn',
+* 'name' is the 1st parameter if defined,
+* 'meta' is the last parameter if defined.
+
+`scopeFn` is a function which gets the layer for the scope as the first parameter;
+
+```javascript
+router.scope('/users', (users) => {
+  // `users` here is a layer instance
+});
+```
+
+you can continue to nest the routes in it;
+
+```javascript
+router.scope('/users', (users) => {
+  // `users` here is a layer instance
+  users.get('/', (ctx) => { ctx.body = 'Users index'; });
+});
+```
+
+### router.register(routes)
+
+While it has designed to be used internally while registering the routes by `router.get()` etc. in classic style, there was a need has arisen to make it public in order to make it useful for Vue Router style too. So, as with most of the others methods of the Router instance, it has variadic argument list. But to encourage you to use the HTTP verb methods (i.e. `router.get()`, `router.post()` so on and so forth) on the router instance (actually from the default layer of the router instance) we are not going to document it's former arguments list (the one used internally). If you are willingly to see it please consult the source code.
+
+This method was made public just for the Vue Router style routes definition. Define your routes as an array and then pass it to this method, like the way we have done in the usage examples above. But for in any case here's a quick example;
+
+```javascript
+const Router = require('@rezeus/korauter');
+
+const router = new Router();
+
+const routes = [
+  {
+    path: '/',
+    handler: (ctx) => { ctx.body = 'Homepage'; },
+  },
+  //
+];
+
+router.register(routes);
+```
+
+### router.url(name, params[, opts])
+
+This method uses the static `Router.url()` method. The primary difference is that this method only works for named routes. So the `name` parameter must correspond an registered route's name. It, then, uses the route's path. As always here's a quick example;
+
+```javascript
+const Router = require('@rezeus/korauter');
+
+const router = new Router();
+
+router.get('Home', '/', (ctx) => { ctx.body = 'Homepage'; });
+router.get('UsersView', '/users/:userId', (ctx) => { ctx.body = `Profile of the user with ID ${ctx.params.userId}`; });
+
+router.url('Home'); // '/'
+Router.url('/'); // '/'
+
+router.url('UsersView', { userId: 42 }); // '/users/42'
+Router.url('/users/:userId', { userId: 42 }); // '/users/42'
+```
+
+### router.resolve()
+
+This is an optional middleware for the Koa app (to be used as `app.use(router.resolve())`) to match the requested URL with a registered one. If a match has found it will be registered to the context (i.e. `ctx.route`). This middleware must be used in conjunction with `router.handle()`, but may be omitted as well. The main purpose of this middleware is to segregate the control of how the route handler (i.e. the action in the MVC lingo) is resolved, and to response with 404 error if no corresponding route has been found.
+
+### router.handle()
+
+This is the middleware where resolved route's handler (i.e. action) is called. If the route hasn't been resolved yet (i.e. the request URL hasn't been found among the registered routes), resolves first and then calls the handler.
+
+### router.routes()
+
+This is a middleware to alias `router.handle()` for convenience and compatibility with the other routers out in the wild. Please see `router.handle()` for the description.
+
 ## Roadmap
 
-* [ ] Tests
+* [x] Tests (still VIP)
 * [ ] Types
 * [ ] Support for `405 Method Not Allowed`
-* [ ] Query parameters for the `.url()`, along with the named parameters
-* [ ] Multiple middleware support per route
+* [x] Query parameters for the `.url()`, along with the named parameters
+* [ ] ~Multiple middleware support per route~
 
 ## Acknowledgements
 
@@ -495,11 +675,42 @@ router.url('ProfileOneUsers', { username: 'john-doe' }); // '/users/john-doe/pro
 * Thanks [julienschmidt](https://github.com/julienschmidt) for implementing the tree in the first place ([httprouter](https://github.com/julienschmidt/httprouter)).
 * Meta data inspired by [Vue Router](https://github.com/vuejs/vue-router). Thanks [Evan You](https://github.com/yyx990803) and [all the contributors](https://github.com/vuejs/vue-router/graphs/contributors) for making this awesome router.
 
+## Comparison with Other Packages
+
+### koa-router
+
+In contrast to the koa-router, Korauter does not use middlewares for the route handlers. Alternative for that to use the middleware and control it by meta data of the route in question. For example;
+
+```javascript
+const Koa = require('koa');
+const Router = require('@rezeus/korauter');
+
+const app = new Koa();
+const router = new Router();
+
+function authMiddleware(ctx, next) {
+  if (!ctx.route.meta.requiresAuth) {
+    await next();
+    return; // skip header check
+  }
+
+  // Check and verify authorization header
+}
+app.use(router.resolve());
+app.use(authMiddleware);
+app.use(router.handle());
+
+router.get('/', (ctx) => { ctx.body = 'Homepage'; });
+router.get('/secret', (ctx) => { ctx.body = 'Secret page'; }, { requiresAuth: true });
+
+// '/secret' requires authentication, thus `authMiddleware` won't skip header check
+```
+
 ## License
+
 MIT License
 
-Copyright (c) 2017 - 2018 Weilin Shi
-              2018 Ozan Müyesseroğlu
+Copyright (c) 2017 - 2018 Weilin Shi, 2018 Ozan Müyesseroğlu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -518,4 +729,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-

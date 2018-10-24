@@ -47,7 +47,7 @@ module.exports = {
         'no-unused-expressions': 'off',
         'chai-friendly/no-unused-expressions': 'error',
 
-        'mocha/max-top-level-suites': ['error', 1], // 1 test suite per test file
+        // 'mocha/max-top-level-suites': ['error', 1], // 1 test suite per test file
         'mocha/no-global-tests': 'error',
         'mocha/no-identical-title': 'error',
         'mocha/no-pending-tests': 'warn',

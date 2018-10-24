@@ -28,7 +28,8 @@
   },
   "homepage": "https://github.com/rezeus/korauter#readme",
   "dependencies": {
-    "path-to-regexp": "^2.4.0"
+    "path-to-regexp": "^2.4.0",
+    "qs": "^6.5.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.0",
