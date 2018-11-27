@@ -126,6 +126,121 @@ describe('Router.url', function() {
     //
   });
 
+  describe('Asynchronous methods of controllers (actions)', function() {
+    it('should not await for synchronous action (synchronous handling)', function() {
+      const router = new Router();
+
+      router.get('/sync', (ctx) => {
+        ctx.body = 'Hello World from synchronous action';
+      });
+
+
+      // Create pseudo-context for the request
+      const ctx = {
+        method: 'get',
+        path: '/sync',
+        body: undefined,
+      };
+
+      const handle = router.handle();
+      handle(ctx);
+
+
+      expect(ctx.body).to.be.eq('Hello World from synchronous action');
+      //
+    });
+
+    it('should not await for synchronous action (asynchronous handling)', async function() {
+      const router = new Router();
+
+      router.get('/sync', (ctx) => {
+        ctx.body = 'Hello World from synchronous action';
+      });
+
+
+      // Create pseudo-context for the request
+      const ctx = {
+        method: 'get',
+        path: '/sync',
+        body: undefined,
+      };
+
+      const handle = router.handle();
+      await handle(ctx);
+
+
+      expect(ctx.body).to.be.eq('Hello World from synchronous action');
+      //
+    });
+
+
+    it('should await for asyncronous action marked with async keyword', async function() {
+      const router = new Router();
+
+      const delay = async (ms, resolveWith = undefined) => new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(resolveWith);
+        }, ms);
+      });
+
+      router.get('/async', async (ctx) => {
+        const message = await delay(50, '50 ms delayed from async action');
+
+        ctx.body = message;
+      });
+
+
+      // Create pseudo-context for the request
+      const ctx = {
+        method: 'get',
+        path: '/async',
+        body: undefined,
+      };
+
+      const handle = router.handle();
+      await handle(ctx);
+
+
+      expect(ctx.body).to.be.eq('50 ms delayed from async action');
+      //
+    });
+
+    it('should await for asyncronous action that returns promise', async function() {
+      const router = new Router();
+
+      const delay = async (ms, resolveWith = undefined) => new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(resolveWith);
+        }, ms);
+      });
+
+      router.get('/async', async ctx => new Promise((resolve) => {
+        delay(75, '75 ms delayed from promise-returning action').then((message) => {
+          ctx.body = message;
+
+          resolve();
+        });
+      }));
+
+
+      // Create pseudo-context for the request
+      const ctx = {
+        method: 'get',
+        path: '/async',
+        body: undefined,
+      };
+
+      const handle = router.handle();
+      await handle(ctx);
+
+
+      expect(ctx.body).to.be.eq('75 ms delayed from promise-returning action');
+      //
+    });
+
+    //
+  });
+
   //
 });
 
