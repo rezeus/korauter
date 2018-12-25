@@ -3,8 +3,10 @@
   "version": "1.0.0-beta.3",
   "description": "Yet another Koa router, inspired by Vue Router.",
   "main": "lib/Router.js",
+  "types": "types/index.d.ts",
   "files": [
     "lib",
+    "types",
     "LICENSE",
     "README.md"
   ],

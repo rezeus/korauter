@@ -61,6 +61,29 @@ describe('Router.url', function() {
     expect(url).to.be.eq(expected);
   });
 
+  // TODO Decide if this feature is necessary
+  // it('should have registered the route with it\'s HTTP method', function() {
+  //   const router = new Router();
+
+  //   router.post('asd', '/users', (ctx) => { ctx.body = 'create user'; });
+  //   router.get('/users/:userId', (ctx) => { ctx.body = 'read user'; });
+  //   router.patch('/users/:userId', (ctx) => { ctx.body = '(partially) update user'; });
+  //   router.put('/users/:userId', (ctx) => { ctx.body = '(completely) update user (replace)'; });
+  //   router.del('/users/:userId', (ctx) => { ctx.body = 'delete user'; });
+
+
+  //   const resolve = router.resolve();
+
+
+  //   const ctx1 = { method: 'post', path: '/users' };
+  //   const r1 = resolve(ctx1);
+
+  //   expect(ctx1.route.method).to.be.eq('post');
+
+
+  //   // TODO Do the above for the rest of the registered routes above
+  // });
+
   it('3', function() {
     const path = '/orders/by/:userId/from/:providerName';
     const params = {
@@ -236,6 +259,16 @@ describe('Router.url', function() {
 
       expect(ctx.body).to.be.eq('75 ms delayed from promise-returning action');
       //
+    });
+
+
+    it.skip('should stall before middlewares to resolve (for async action)', function() {
+      // TODO TR Yani bu route'dan önce tanımlanmış ve başlatılmış middleware'leri bekletiyor olmalı
+      const router = new Router({});
+    });
+
+    it.skip('should postpone after middlewares invocation (for async action)', function() {
+      // TODO TR Yani bu route'dan sonra tanımlanmış bir middleware varsa bu route'un resolve etmesini beklemeli
     });
 
     //
