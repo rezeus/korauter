@@ -1,7 +1,6 @@
 'use strict';
 
 const chai = require('chai');
-const qs = require('qs');
 
 const Router = require('../lib/Router');
 
@@ -115,38 +114,6 @@ describe('Router.url', function() {
 
   it('5', function() {
     expect(Router.url('/users/:id', { id: 1 }, { query: { active: true } })).to.be.eq('/users/1?active=true');
-  });
-
-  describe('Compatibility with ljharb/qs', function() {
-    it('1', function() {
-      // From '../3'
-      const path = '/orders/by/:userId/from/:providerName';
-      const params = {
-        userId: 42,
-        providerName: 'provider-a',
-      };
-      const opts = {
-        query: {
-          q: '1032503',
-          sort: ['-id', 'userId'],
-          foo: {
-            bar: 'true',
-            baz: 'false',
-          },
-        },
-        encode: false,
-      };
-
-      const url = Router.url(path, params, opts);
-
-
-      const queryPart = url.substring(url.indexOf('?') + 1);
-      const parsed = qs.parse(queryPart);
-
-      expect(parsed).to.deep.eq(opts.query);
-    });
-
-    //
   });
 
   describe('Asynchronous methods of controllers (actions)', function() {

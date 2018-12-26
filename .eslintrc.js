@@ -17,10 +17,6 @@ module.exports = {
     'mocha',
     'chai-friendly',
   ],
-  globals: {
-    bus: true,
-    logger: true,
-  },
   rules: {
     // 'no-param-reassign': 1,
     'prefer-destructuring': ['error', {
@@ -28,6 +24,25 @@ module.exports = {
         array: false,
         object: true,
       },
+    }],
+    'no-use-before-define': ['error', {
+      functions: false,
+      classes: true,
+      variables: true,
+    }],
+    'comma-dangle': ['error', {
+      arrays: 'always-multiline',
+      objects: 'always-multiline',
+      imports: 'always-multiline',
+      exports: 'always-multiline',
+      functions: 'ignore',
+    }],
+    'max-len': ['error', 100, 2, {
+      ignoreUrls: true,
+      ignoreComments: true,
+      ignoreRegExpLiterals: true,
+      ignoreStrings: true,
+      ignoreTemplateLiterals: true,
     }],
   },
   overrides: [

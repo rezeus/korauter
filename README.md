@@ -12,10 +12,9 @@ Yet another Koa router, inspired by Vue Router.
 * [API](#api)
   * [Router.url(path, params[, opts])](#routerurlpath-params-opts)
   * [Router([options])](#routeroptions)
-  * [router\[get|post|put|del|patch\]\(args)](#routergetpostputdelpatchargs)
+  * [router\[get|post|put|delete|patch\]\(args)](#routergetpostputdeletepatchargs)
   * [router.scope(args)](#routerscopeargs)
   * [router.register(routes)](#routerregisterroutes)
-  * [router.url\(name, params\[, opts\]\)](#routerurlname-params-opts)
   * [router.resolve()](#routerresolve)
   * [router.handle()](#routerhandle)
   * [router.routes()](#routerroutes)
@@ -544,7 +543,7 @@ router.scope('Users', '/users', (users) => {
 router.url('ProfileOneUsers', { username: 'john-doe' }); // '/users/john-doe/profile'
 ```
 
-### router[get|post|put|del|patch]\(args)
+### router[get|post|put|delete|patch]\(args)
 
 Arguments list may be one of;
 
@@ -629,25 +628,6 @@ const routes = [
 router.register(routes);
 ```
 
-### router.url(name, params[, opts])
-
-This method uses the static `Router.url()` method. The primary difference is that this method only works for named routes. So the `name` parameter must correspond an registered route's name. It, then, uses the route's path. As always here's a quick example;
-
-```javascript
-const Router = require('@rezeus/korauter');
-
-const router = new Router();
-
-router.get('Home', '/', (ctx) => { ctx.body = 'Homepage'; });
-router.get('UsersView', '/users/:userId', (ctx) => { ctx.body = `Profile of the user with ID ${ctx.params.userId}`; });
-
-router.url('Home'); // '/'
-Router.url('/'); // '/'
-
-router.url('UsersView', { userId: 42 }); // '/users/42'
-Router.url('/users/:userId', { userId: 42 }); // '/users/42'
-```
-
 ### router.resolve()
 
 This is an optional middleware for the Koa app (to be used as `app.use(router.resolve())`) to match the requested URL with a registered one. If a match has found it will be registered to the context (i.e. `ctx.route`). This middleware must be used in conjunction with `router.handle()`, but may be omitted as well. The main purpose of this middleware is to segregate the control of how the route handler (i.e. the action in the MVC lingo) is resolved, and to response with 404 error if no corresponding route has been found.
@@ -663,7 +643,7 @@ This is a middleware to alias `router.handle()` for convenience and compatibilit
 ## Roadmap
 
 * [x] Tests (still VIP)
-* [ ] Types
+* [x] Types
 * [ ] Support for `405 Method Not Allowed`
 * [x] Query parameters for the `.url()`, along with the named parameters
 * [ ] ~Multiple middleware support per route~
@@ -671,8 +651,7 @@ This is a middleware to alias `router.handle()` for convenience and compatibilit
 ## Acknowledgements
 
 * Concept inspired by [koa-router](https://github.com/alexmingoia/koa-router), kudos [alexmingoia](https://github.com/alexmingoia).
-* Tree implementation was taken from [koa-tree-router](https://github.com/steambap/koa-tree-router), special thanks to [steambap](https://github.com/steambap/koa-tree-router) for her/his (_pardon me Weilin Shi_) amazing work of porting the tree implementation.
-* Thanks [julienschmidt](https://github.com/julienschmidt) for implementing the tree in the first place ([httprouter](https://github.com/julienschmidt/httprouter)).
+* Underlying tree implementation is [route-trie](https://github.com/zensh/route-trie) by [Yan Qing](https://github.com/zensh).
 * Meta data inspired by [Vue Router](https://github.com/vuejs/vue-router). Thanks [Evan You](https://github.com/yyx990803) and [all the contributors](https://github.com/vuejs/vue-router/graphs/contributors) for making this awesome router.
 
 ## Comparison with Other Packages
@@ -710,7 +689,7 @@ router.get('/secret', (ctx) => { ctx.body = 'Secret page'; }, { requiresAuth: tr
 
 MIT License
 
-Copyright (c) 2017 - 2018 Weilin Shi, 2018 Ozan Müyesseroğlu
+Copyright (c) 2018 Ozan Müyesseroğlu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -3,10 +3,8 @@
   "version": "1.0.0-beta.3",
   "description": "Yet another Koa router, inspired by Vue Router.",
   "main": "lib/Router.js",
-  "types": "types/index.d.ts",
   "files": [
     "lib",
-    "types",
     "LICENSE",
     "README.md"
   ],
@@ -30,8 +28,7 @@
   },
   "homepage": "https://github.com/rezeus/korauter#readme",
   "dependencies": {
-    "path-to-regexp": "^2.4.0",
-    "qs": "^6.5.2"
+    "route-trie": "^3.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.0",
