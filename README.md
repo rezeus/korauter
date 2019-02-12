@@ -27,7 +27,7 @@ Yet another Koa router, inspired by Vue Router.
 ## Features
 
 * Express-style routing; e.g. `router.get`, `router.post`
-* Named routes for URL generation with named URL parameters
+* TODO Named routes for URL generation with named URL parameters
 * Router scopes (in Classic Style)
 * Nested router records (in Vue Router Style)
 * Meta data for routes
